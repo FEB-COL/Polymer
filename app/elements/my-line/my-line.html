@@ -1,0 +1,124 @@
+<link rel="import" href="../bower_components/Chart.js/chartjs-import.html">
+<link rel="import" href="../polymer/polymer.html">
+
+ <dom-module id="my-line">
+    <template>
+      <canvas id="canvas" width="{{width}}" height="{{height}}"></canvas>
+    </template>
+
+  <script>
+    Polymer({
+      is: 'my-line',
+      properties: {
+        colors: {
+          type: Array,
+          value: [
+              '253,180,92',
+              '247,70,74',
+              '70,191,189',
+              '148,159,177',
+              '77,83,96'
+            ],
+          
+          notify: true,
+          observer: 'updateChart'
+        },
+        height: {
+          notify: true,
+          observer: 'resize'
+        },
+        labels: {
+          type: Array,
+          value:  [
+              'Jan',
+              'Feb',
+              'Mar',
+              'Apr',
+              'May',
+              'Jun',
+              'Jul'
+            ]
+          ,
+          notify: true,
+          observer: 'updateChart'
+        },
+        options: {
+          type: Object,
+          value:  {}
+          ,
+          notify: true,
+          observer: 'updateChart'
+        },
+        values: {
+          type: Array,
+          value: 
+             [
+              [
+                65,
+                59,
+                90,
+                81,
+                56,
+                55,
+                40
+              ],
+              [
+                28,
+                48,
+                40,
+                19,
+                96,
+                27,
+                100
+              ]
+            ]
+          ,
+          notify: true,
+          observer: 'updateChart'
+        },
+        width: {
+          notify: true,
+          observer: 'resize'
+        }
+      },
+      resize: function () {
+        if (this.chart) {
+          this.updateChart();
+        }
+      },
+     updateChart:function() {
+        this.async(function() {
+          if (this.chart) {
+            this.chart.destroy();
+            // Bindings don't seem to be taking effect properly so
+            // manually set width and height
+            this.$.canvas.setAttribute('width', this.width);
+            this.$.canvas.setAttribute('height', this.height);
+          }
+          this.datasets = [];
+         
+          // console.log("val== "+val+"i=="+i);
+          this.values.forEach(function (val, i) {
+             
+            this.datasets.push({
+              fillColor:    "rgba(" + this.colors[i] + ",0.5)",
+              strokeColor:  "rgba(" + this.colors[i] + ",1)",
+              pointColor:   "rgba(" + this.colors[i] + ",1)",
+              pointStrokeColor: "#fff",
+              data: this.values[i]
+            });
+          }, this);
+
+          this.data = { labels: this.labels, datasets: this.datasets };
+          this.ctx = this.$.canvas.getContext('2d');
+         
+          var self = this;
+          setTimeout(function(){
+          self.chart = new Chart(self.ctx).Line(self.data, self.options);
+          },0);
+        }, null, 0);
+      }
+    });
+  </script>
+  </dom-module>
+
